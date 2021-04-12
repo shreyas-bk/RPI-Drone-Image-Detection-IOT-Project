@@ -21,7 +21,7 @@ app = Flask(__name__)
 run_with_ngrok(app)  
 
 model_path = os.path.join('snapshots', 'version8_resplit_test_train', 'resnet50_csv_12_inference.h5')
-model = models.load_model('/content/aerial_pedestrian_detection/resnet50_csv_12_inference.h5', backbone_name='resnet50')
+model = models.load_model('/content/RPI-Drone-Image-Detection-IOT-Project/resnet50_csv_12_inference.h5', backbone_name='resnet50')
 labels_to_names = {0: 'Biker', 1: 'Car', 2: 'Bus', 3: 'Cart', 4: 'Skater', 5: 'Pedestrian'}
 
 def run_detection_image(filepath):
@@ -48,7 +48,7 @@ def run_detection_image(filepath):
         b = box.astype(int)
         draw_box(draw, b, color=color)
         draw_caption(draw, b, caption)
-    with open('/content/img_results.txt','w') as f:
+    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
       f.write('Number of detections:'+str(count)+'\n')
     plt.figure(figsize=(15, 15))
     plt.axis('off')
@@ -57,18 +57,18 @@ def run_detection_image(filepath):
     
     file, ext = os.path.splitext(filepath)
     image_name = file.split('/')[-1] + ext
-    output_path = os.path.join('/content/flask-app/static/results/', image_name)
+    output_path = os.path.join('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results', image_name)
     print(output_path)
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, draw_conv)
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-  sdd_images = os.listdir('/content/aerial_pedestrian_detection/imgs')
-  base_path = '/content/aerial_pedestrian_detection/imgs//'
+  sdd_images = os.listdir('/content/gdrive/MyDrive/IOT/Images')
+  base_path = '/content/gdrive/MyDrive/IOT/Images//'
   for image in sdd_images:
     if image!='.ipynb_checkpoints':
       run_detection_image(os.path.join(base_path,image))
-  with open('/content/img_results.txt', 'r') as f: 
+  with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
     return render_template('test.html',text = f.read())
 app.run()
