@@ -1,5 +1,6 @@
 from flask_ngrok import run_with_ngrok
 import os
+from pathlib import Path
 import keras
 from keras_retinanet import models
 from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
@@ -50,25 +51,25 @@ def run_detection_image(filepath):
         draw_caption(draw, b, caption)
     with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
       f.write('Number of detections:'+str(count)+'\n')
-    plt.figure(figsize=(15, 15))
-    plt.axis('off')
-    plt.imshow(draw)
-    plt.show()
     
     file, ext = os.path.splitext(filepath)
     image_name = file.split('/')[-1] + ext
     output_path = os.path.join('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results', image_name)
-    print(output_path)
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, draw_conv)
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-  sdd_images = os.listdir('/content/gdrive/MyDrive/IOT/Images')
-  base_path = '/content/gdrive/MyDrive/IOT/Images//'
-  for image in sdd_images:
-    if image!='.ipynb_checkpoints':
-      run_detection_image(os.path.join(base_path,image))
+  dirpath = '/content/gdrive/MyDrive/images'
+  posix_images = sorted(Path(dirpath).iterdir(), key=os.path.getmtime)
+  drone_imgs = []
+  for image in posix_images:
+    if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
+      drone_imgs.append(image)
+  for image in drone_imgs:
+    print(image)
+    if '.ipynb_checkpoints' not in str(image):
+      run_detection_image(image)
   with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
-    return render_template('test.html',text = f.read())
+    return render_template('test.html',text = f.read(),img_path = 'static/results/'+str(image)[len(dirpath):])
 app.run()
