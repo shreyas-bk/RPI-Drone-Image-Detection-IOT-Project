@@ -1,5 +1,7 @@
 from flask_ngrok import run_with_ngrok
 import os
+import sys
+from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 import keras
 from keras_retinanet import models
@@ -58,19 +60,38 @@ def run_detection_image(filepath):
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, draw_conv)
 
-
-
+def get_chrono(dir_path):
+  entries = (os.path.join(dir_path, file_name) for file_name in os.listdir(dir_path))
+  entries = ((os.stat(path), path) for path in entries)
+  entries = ((stat[ST_CTIME], path)
+           for stat, path in entries if S_ISREG(stat[ST_MODE]))
+  entries_list = []
+  for entry in entries:
+    entries_list.append(entry)
+  sorted_entries_list = sorted(entries_list)
+  sorted_paths = []
+  for sorted_entry in sorted_entries_list:
+    sorted_paths.append(sorted_entry[1])
+  return sorted_paths
+prev_paths = []
 @app.route("/", methods=['GET', 'POST'])
 def home():
-  dirpath = '/content/gdrive/MyDrive/images'
-  posix_images = sorted(Path(dirpath).iterdir(), key=os.path.getmtime)
+  dir_path = '/content/gdrive/MyDrive/images'
+  posix_images = get_chrono(dir_path)
   drone_imgs = []
   for image in posix_images:
     if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
       drone_imgs.append(image)
   latest_image = drone_imgs[-1]
-  if '.ipynb_checkpoints' not in str(latest_image):
-    run_detection_image(latest_image)
+  global prev_paths
+  if len(drone_imgs)!=len(prev_paths):
+    new_imgs = drone_imgs[len(drone_imgs)-(len(drone_imgs)-len(prev_paths)):]
+    latest_image = drone_imgs[-1]
+    print(new_imgs,latest_image)
+    if '.ipynb_checkpoints' not in new_imgs:
+        for image_to_run in new_imgs:
+            run_detection_image(image_to_run)
+        prev_paths = drone_imgs
   with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
-    return render_template('test.html',text = f.read(),img_path = 'static/results/'+str(latest_image)[len(dirpath):])
+    return render_template('test.html',text = f.read(),img_path = 'static/results/'+str(latest_image)[len(dir_path):])
 app.run()
