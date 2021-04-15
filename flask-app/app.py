@@ -58,6 +58,8 @@ def run_detection_image(filepath):
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, draw_conv)
 
+
+
 @app.route("/", methods=['GET', 'POST'])
 def home():
   dirpath = '/content/gdrive/MyDrive/images'
@@ -66,10 +68,9 @@ def home():
   for image in posix_images:
     if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
       drone_imgs.append(image)
-  for image in drone_imgs:
-    print(image)
-    if '.ipynb_checkpoints' not in str(image):
-      run_detection_image(image)
+  latest_image = drone_imgs[-1]
+  if '.ipynb_checkpoints' not in str(latest_image):
+    run_detection_image(latest_image)
   with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
-    return render_template('test.html',text = f.read(),img_path = 'static/results/'+str(image)[len(dirpath):])
+    return render_template('test.html',text = f.read(),img_path = 'static/results/'+str(latest_image)[len(dirpath):])
 app.run()
