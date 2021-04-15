@@ -1,5 +1,7 @@
 from flask_ngrok import run_with_ngrok
 import os
+import sys
+from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 import keras
 from keras_retinanet import models
@@ -60,6 +62,19 @@ def run_detection_image(filepath):
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     cv2.imwrite(output_path, draw_conv)
 
+def get_chrono(dir_path):
+  entries = (os.path.join(dir_path, file_name) for file_name in os.listdir(dir_path))
+  entries = ((os.stat(path), path) for path in entries)
+  entries = ((stat[ST_CTIME], path)
+           for stat, path in entries if S_ISREG(stat[ST_MODE]))
+  entries_list = []
+  for entry in entries:
+    entries_list.append(entry)
+  sorted_entries_list = sorted(entries_list)
+  sorted_paths = []
+  for sorted_entry in sorted_entries_list:
+    sorted_paths.append(sorted_entry[1])
+  return sorted_paths
 
 def gen_frames(): 
     prev_imgs = [] 
@@ -67,7 +82,7 @@ def gen_frames():
     dirpath = '/content/gdrive/MyDrive/images'
     while True:
         #print(prev_latest_image)
-        posix_images = sorted(Path(dirpath).iterdir(), key=os.path.getmtime)
+        posix_images = get_chrono(dirpath)
         drone_imgs = []
         for image in posix_images:
           if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
