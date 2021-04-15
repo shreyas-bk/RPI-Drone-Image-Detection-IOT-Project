@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Person Detection for Drone Images</title>
+</head>
+<body>
+<div class="bd-example" align="middle">
+  <img src="{{url_for('video_feed')}}" align="middle" width="300" height="450">
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script>
+  if (!!window.EventSource) {
+    var source = new EventSource('/count_feed');
+    source.onmessage = function(e) {
+      $("#data").text(e.data);
+    }
+  }
+  </script>
+  <div id="data">nothing received yet</div>
+</body>
+</html>
