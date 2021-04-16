@@ -81,7 +81,8 @@ def get_chrono(dir_path):
 def gen_frames(): 
     prev_imgs = [] 
     prev_latest_image = ''
-    dirpath = '/content/gdrive/MyDrive/images'
+    dirpath = '/content/gdrive/MyDrive/images/IMG'
+    extract_path = '/content/gdrive/MyDrive/extracted'
     while True:
         posix_images = get_chrono(dirpath)
         drone_imgs = []
@@ -91,9 +92,20 @@ def gen_frames():
             drone_imgs.append(image)
         if 'zip' in drone_imgs[-1]:
             with zipfile.ZipFile(drone_imgs[-1], 'r') as zip_ref:
-                zip_ref.extractall(dirpath)
-            os.remove(drone_imgs[-1])
-        posix_images = get_chrono(dirpath)
+                zip_ref.extractall(extract_path)
+            base = '/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis/'
+            send_to = '/content/gdrive/MyDrive/extracted/'
+            lis = os.listdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
+            for i in lis:
+              print(base+i)
+              os.rename(base+i,send_to+i)
+            os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
+            os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download')
+            os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents')
+            os.rmdir('/content/gdrive/MyDrive/extracted/home/pi')
+            os.rmdir('/content/gdrive/MyDrive/extracted/home')
+            # #os.remove(drone_imgs[-1])
+        posix_images = get_chrono(extract_path)
         drone_imgs = []
         
         for image in posix_images:
@@ -109,7 +121,7 @@ def gen_frames():
                       run_detection_image(image_to_run)
                   prev_latest_image = latest_image
                   prev_imgs = drone_imgs
-        img_path = 'static/results/'+str(prev_latest_image)[len(dirpath):]
+        img_path = 'static/results/'+str(prev_latest_image)[len(extract_path):]
         buff = cv2.imread('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/'+img_path)
         (flag, buff) = cv2.imencode(".jpg", buff)
         frame = buff.tobytes()
