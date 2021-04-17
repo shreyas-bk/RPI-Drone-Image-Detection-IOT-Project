@@ -60,10 +60,14 @@ def run_detection_image(filepath):
         b = box.astype(int)
         draw_box(draw, b, color=color)
         draw_caption(draw, b, caption)
-    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
-      f.write('Number of detections:'+str(count)+'\n')
     
     file, ext = os.path.splitext(filepath)
+    print(file)
+    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
+      if 'default' in file:
+        f.write('Waiting for input from Raspi\n')
+      else:
+        f.write('Number of detections:'+str(count)+'\n')
     image_name = file.split('/')[-1] + ext
     output_path = os.path.join('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results', image_name)
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
@@ -104,7 +108,6 @@ def gen_frames():
             lis = os.listdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
             
             for i in lis:
-              print(base+i)
               os.rename(base+i,send_to+i)
 
             os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
@@ -142,14 +145,13 @@ def video_feed():
 
 @app.route('/count_feed')
 def count_feed():
-    if request.headers.get('accept') == 'text/event-stream':
-        def events():
-            while True:
-                with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
-                    text = f.read()
-                yield "data: %s \n\n" % (text)
-                time.sleep(1)
-        return Response(events(), content_type='text/event-stream')
+    def events():
+        while True:
+            with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
+                text = f.read()
+            yield "data: %s \n\n" % (text)
+            time.sleep(1)
+    return Response(events(), content_type='text/event-stream')
 
 @app.route('/map/<string:query>')
 def map(query):
@@ -167,7 +169,7 @@ def display_all():
     init_image_names = posix_images = get_chrono(dirpath)
     image_names = []
     for i in init_image_names:
-      if 'jpg' in i:
+      if 'jpg' in i and 'default' not in i:
         image_names.append(i[len(dirpath):])
     return render_template('display_all.html',image_names = image_names)
 
@@ -186,5 +188,5 @@ for i in init_results:
     os.remove('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+i)
 
 with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
-      f.write('Number of detections:\n')
+      f.write('Waiting for input from Raspi\n')
 app.run()
