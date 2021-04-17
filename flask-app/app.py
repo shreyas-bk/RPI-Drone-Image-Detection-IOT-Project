@@ -146,6 +146,10 @@ def count_feed():
                 time.sleep(1)
         return Response(events(), content_type='text/event-stream')
 
+@app.route('/map')
+def map():
+    return render_template('maps.html')
+
 @app.route('/display_all')
 def display_all():
     dirpath = '/content/gdrive/MyDrive/extracted'
