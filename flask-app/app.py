@@ -18,6 +18,9 @@ import tensorflow as tf
 import itertools
 import time
 import zipfile
+from random import seed
+from random import random
+seed(1)
 
 def get_session():
     config = tf.ConfigProto()
@@ -61,6 +64,12 @@ def run_detection_image(filepath):
       f.write('Number of detections:'+str(count)+'\n')
     
     file, ext = os.path.splitext(filepath)
+    base_lat = 23.2599
+    base_long = 77.4126
+    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+str(file.split('/')[-1])+'.txt','w') as f:
+      lat = base_lat+(0.01*random()-0.0005)
+      lon = base_long+(0.01*random()-0.0005)
+      f.write(str(lat)+' '+str(lon)+'\n')
     image_name = file.split('/')[-1] + ext
     output_path = os.path.join('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results', image_name)
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
@@ -146,9 +155,15 @@ def count_feed():
                 time.sleep(1)
         return Response(events(), content_type='text/event-stream')
 
-@app.route('/map')
-def map():
-    return render_template('maps.html')
+@app.route('/map/<string:query>')
+def map(query):
+    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+str(query[:-4].split('/')[-1])+'.txt','r') as f:
+      coords = f.read().split()
+      print(coords)
+      lat = round(float(coords[0]),4)
+      lon = round(float(coords[1]),4)
+    gps = [lat, lon]
+    return render_template('maps.html',gps = gps)
 
 @app.route('/display_all')
 def display_all():
