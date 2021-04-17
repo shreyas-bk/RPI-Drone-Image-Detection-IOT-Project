@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="refresh" content="3.5">
+ <title></title>
+ <meta charset="utf-8" />
+</head>
+<body> 
+<div class="bd-example" align="middle">
+ {% for name in image_names %}
+  <img src="{{ url_for('static', filename='results/' + name) }} " align="middle" width="300" height="450">
+  <br> No of detectios <br>
+ {% endfor %}
+</div>
+</body>
+</html>
