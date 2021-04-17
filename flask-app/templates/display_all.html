@@ -10,7 +10,7 @@
  {% for name in image_names %}
   <img src="{{ url_for('static', filename='results/' + name) }} " align="middle" width="300" height="450">
   <br>
-  <a href="map" class="btn btn-primary">GPS Location on Google Maps</a>
+  <a href="{{ url_for('map' ,query=name) }}" class="btn btn-primary">GPS Location on Google Maps</a>
   <br>
  {% endfor %}
 </div>
