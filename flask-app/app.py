@@ -64,12 +64,6 @@ def run_detection_image(filepath):
       f.write('Number of detections:'+str(count)+'\n')
     
     file, ext = os.path.splitext(filepath)
-    base_lat = 23.2599
-    base_long = 77.4126
-    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+str(file.split('/')[-1])+'.txt','w') as f:
-      lat = base_lat+(0.01*random()-0.0005)
-      lon = base_long+(0.01*random()-0.0005)
-      f.write(str(lat)+' '+str(lon)+'\n')
     image_name = file.split('/')[-1] + ext
     output_path = os.path.join('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results', image_name)
     draw_conv = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
@@ -92,35 +86,37 @@ def get_chrono(dir_path):
 def gen_frames(): 
     prev_imgs = [] 
     prev_latest_image = ''
-    dirpath = '/content/gdrive/MyDrive/images/IMG'
+    dirpath = '/content/gdrive/MyDrive/images/Upload'
     extract_path = '/content/gdrive/MyDrive/extracted'
     while True:
         posix_images = get_chrono(dirpath)
         drone_imgs = []
-        
+
         for image in posix_images:
           if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
             drone_imgs.append(image)
-        if 'zip' in drone_imgs[-1]:
+
+        if len(drone_imgs)!=0 and 'zip' in drone_imgs[-1]:
             with zipfile.ZipFile(drone_imgs[-1], 'r') as zip_ref:
                 zip_ref.extractall(extract_path)
             base = '/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis/'
             send_to = '/content/gdrive/MyDrive/extracted/'
             lis = os.listdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
+            
             for i in lis:
               print(base+i)
               os.rename(base+i,send_to+i)
+
             os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download/zipthis')
             os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents/download')
             os.rmdir('/content/gdrive/MyDrive/extracted/home/pi/Documents')
             os.rmdir('/content/gdrive/MyDrive/extracted/home/pi')
             os.rmdir('/content/gdrive/MyDrive/extracted/home')
-            # #os.remove(drone_imgs[-1])
         posix_images = get_chrono(extract_path)
         drone_imgs = []
-        
+
         for image in posix_images:
-          if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image):
+          if '.ipynb_checkpoints' not in str(image) and 'shortcut-targets-by-id' not in str(image) and 'txt' not in str(image):
             drone_imgs.append(image)
 
         if len(drone_imgs)!=len(prev_imgs):
@@ -157,7 +153,7 @@ def count_feed():
 
 @app.route('/map/<string:query>')
 def map(query):
-    with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+str(query[:-4].split('/')[-1])+'.txt','r') as f:
+    with open('/content/gdrive/MyDrive/extracted/'+str(query[:-4].split('/')[-1])+'.txt','r') as f:
       coords = f.read().split()
       print(coords)
       lat = round(float(coords[0]),4)
@@ -178,7 +174,17 @@ def display_all():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
-    
+
+init_extract = os.listdir('/content/gdrive/MyDrive/extracted')
+for i in init_extract:
+  if 'default' not in i and 'ipynb_checkpoints' not in i:
+    os.remove('/content/gdrive/MyDrive/extracted/'+i)
+
+init_results = os.listdir('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results')
+for i in init_results:
+  if 'ipynb_checkpoints' not in i:
+    os.remove('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/'+i)
+
 with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','w') as f:
       f.write('Number of detections:\n')
 app.run()
