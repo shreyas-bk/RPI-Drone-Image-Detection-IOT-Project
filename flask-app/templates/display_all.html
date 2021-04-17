@@ -8,11 +8,14 @@
 <body> 
 <div class="bd-example" align="middle">
  {% for name in image_names %}
+  <br> {{'Received at:\n'+'Time: '+name[12:14]+':'+name[14:16]+':'+name[16:18]+'\n'+'Date: '+name[6:8]+'/'+name[9:11]+'/'+name[1:5]}} <br>
   <img src="{{ url_for('static', filename='results/' + name) }} " align="middle" width="300" height="450">
   <br>
   <a href="{{ url_for('map' ,query=name) }}" class="btn btn-primary">GPS Location on Google Maps</a>
   <br>
+  <br>
  {% endfor %}
+  <br> End of Processed Images
 </div>
 </body>
 </html>
