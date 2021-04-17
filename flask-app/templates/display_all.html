@@ -9,7 +9,9 @@
 <div class="bd-example" align="middle">
  {% for name in image_names %}
   <img src="{{ url_for('static', filename='results/' + name) }} " align="middle" width="300" height="450">
-  <br> No of detectios <br>
+  <br>
+  <a href="map" class="btn btn-primary">GPS Location on Google Maps</a>
+  <br>
  {% endfor %}
 </div>
 </body>
