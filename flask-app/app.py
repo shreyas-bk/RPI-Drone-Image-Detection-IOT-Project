@@ -146,6 +146,16 @@ def count_feed():
                 time.sleep(1)
         return Response(events(), content_type='text/event-stream')
 
+@app.route('/display_all')
+def display_all():
+    dirpath = '/content/gdrive/MyDrive/extracted'
+    init_image_names = posix_images = get_chrono(dirpath)
+    image_names = []
+    for i in init_image_names:
+      if 'jpg' in i:
+        image_names.append(i[len(dirpath):])
+    return render_template('display_all.html',image_names = image_names)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
