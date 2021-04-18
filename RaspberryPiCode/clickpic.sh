@@ -1,4 +1,5 @@
 #!/bin/bash
+#The above line tells the system to execute the script using the Bash shell.
 
 rm -rfv /home/pi/Documents/download/Upload/*
 
@@ -7,7 +8,7 @@ while [ $a -lt 11 ]
 do   
     DATE=$(date +"%Y-%m-%d_%H%M%S") 
     echo $DATE
-    raspistill -vf -hf -o /home/pi/Documents/download/zipthis/$DATE.jpg
+    raspistill -o /home/pi/Documents/download/zipthis/$DATE.jpg
     python3 gps.py $DATE
     a=`expr $a + 1`
     sleep 4
