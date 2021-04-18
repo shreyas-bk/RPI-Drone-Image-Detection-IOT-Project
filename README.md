@@ -2,6 +2,10 @@
 Group 13: Drone Image Detection
 Project Members: Shreyas Bhat Kera: 2018A7S1119P, N Harishchandra Prasad: 2018A3PS0422P, Mihir Abhay Deshmukh: 2018A4PS0508P
 
+## Pipeline
+
+![](IOT-Pipeline.png)
+
 Raspberry Pi:
 -          Acquires drone image and corresponding GPS data. (In this project we simulate the images and GPS data, however we have written code to allow data to be captured from the Raspberry Pi Camera Module v2 sensor and the NEO-6M GPS Module sensor.)
 -          Authorize and sync the Raspberry Pi to Drive to allow file transfer between the two, using rclone.
