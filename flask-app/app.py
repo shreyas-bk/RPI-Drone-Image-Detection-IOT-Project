@@ -149,8 +149,8 @@ def count_feed():
         while True:
             with open('/content/RPI-Drone-Image-Detection-IOT-Project/flask-app/static/results/img_results.txt','r') as f:
                 text = f.read()
+            time.sleep(.1)
             yield "data: %s \n\n" % (text)
-            time.sleep(1)
     return Response(events(), content_type='text/event-stream')
 
 @app.route('/map/<string:query>')
