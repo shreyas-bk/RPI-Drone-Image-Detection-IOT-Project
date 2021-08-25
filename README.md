@@ -1,7 +1,10 @@
 # RPI-Drone-Image-Detection-IOT-Project
 Project Members: 
+
 Shreyas Bhat Kera
+
 N Harishchandra Prasad
+
 Mihir Abhay Deshmukh
 
 ## Pipeline
