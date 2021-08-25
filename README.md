@@ -1,6 +1,8 @@
 # RPI-Drone-Image-Detection-IOT-Project
-Group 13: Drone Image Detection
-Project Members: Shreyas Bhat Kera: 2018A7S1119P, N Harishchandra Prasad: 2018A3PS0422P, Mihir Abhay Deshmukh: 2018A4PS0508P
+Project Members: 
+Shreyas Bhat Kera
+N Harishchandra Prasad
+Mihir Abhay Deshmukh
 
 ## Pipeline
 
