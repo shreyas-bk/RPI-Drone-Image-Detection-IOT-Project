@@ -1,3 +1,5 @@
+[Article](https://medium.com/@shreykera7/person-detection-from-raspberry-pi-images-40c0bf5d6b8f)
+
 # RPI-Drone-Image-Detection-IOT-Project
 Project Members: Shreyas Bhat Kera, N Harishchandra Prasad, Mihir Abhay Deshmukh
 
